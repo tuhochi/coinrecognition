@@ -1,0 +1,6 @@
+#summary One-sentence summary of this page.
+
+= Erkennung der Münzen als Kreise =
+
+
+http://coinrecognition.googlecode.com/svn/wiki/image/KreisErkennung.png

@@ -1,5 +1,4 @@
-#summary One-sentence summary of this page.
-
+#Beschreibung der einzelnen Schritte
 = Erkennung der Münzen als Kreise =
 
 

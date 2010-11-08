@@ -1,4 +1,3 @@
-#Beschreibung der einzelnen Schritte
 = Erkennung der Münzen als Kreise =
 
 

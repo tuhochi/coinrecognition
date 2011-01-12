@@ -1,0 +1,13 @@
+
+%Pfad des Testfiles
+%imgPath='coin/TestData_low/test1.jpg';
+imgPath='coin/TrainingsData_low/20centR/20centkopf.jpg';
+
+%Extrahieren der Coins
+coins=getCoinsFromImage(imgPath,135/4);
+
+%Klassifizierung
+[coins labels result1 result2] = classifyCoin(coins);
+
+
+

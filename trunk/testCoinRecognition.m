@@ -2,7 +2,7 @@
 %Pfad des Testfiles
 %Unbekanntes Testfile
 imgPath='coin/TestData_low/test1.jpg';
-%imgPath='coin/TestData_low/test2.jpg';
+imgPath='coin/TestData_low/test2.jpg';
 %imgPath='coin/TestData_low/test3.jpg';
 
 %Vom TrainingSet

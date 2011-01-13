@@ -2,6 +2,23 @@ function [coins] = getCoinsFromImage(image,radius,debug)
 % Es wird mittels der hough-Transformation die einzelnen Coins gesucht und
 % als Struct "coins" returnt
 % diagonal ist der ungefaehr gesuchte radias
+
+
+%% speed up
+if isstr(image)
+    if exist(image)
+        matfile=[image '.mat'];
+        if exist(matfile) % aus matfile laden wenn existiert
+            load(matfile);
+            return
+        end
+    else
+        error('Das Bild konnte nicht gefunden werden');
+    end
+end
+
+%%
+
 time=tic();
 global TEST;
 TEST=1;
@@ -179,6 +196,14 @@ end
 coins=c;
 
 toc(time)
+
+
+%% speed up
+% in matfile speichern damit es naechstes mal schneller geht!!
+if size(i,2)>0
+    save(matfile,'coins');
+end
+%%
 
 end
 

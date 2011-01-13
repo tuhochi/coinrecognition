@@ -7,15 +7,19 @@ imgPolar=imgCartToLogpolar(imgGray);
 
 % Polartransformiete Bilder muessen noch zugeschnitten werden (y-Achse)
 d=round((size(imgPolar,1)-(size(imgPolar,1)/sqrt(2)))/4  *1.2);% Abstand auf der Y Achse (unten und oben)// +20%
-imgPolar=imgPolar(d:end-2*d,:);
+imgPolar=imgPolar(d:end-d,:);
 
 %DFT-Koeffiziente
 coeff=calcCoeff(imgPolar,maxDim+1);
 
 
+%   figure
+%   disp('Polarbild: buildFeatureVector')
+%   imshow(imgPolar,[])
+
 %k-Kreise berechnen
 maxR = size(imgPolar,1);
-K=15; %Anzahl der Kreise
+K=10; %Anzahl der Kreise
 featureVeuclid=[];
 featureVsvm=[];
 kreisCoeff=[];

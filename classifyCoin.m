@@ -2,6 +2,14 @@ function [ coins labels result1 result2 ] = classifyCoin(coins,imgPath)
 %CLASSIFYCOIN Summary of this function goes here
 %   Detailed explanation goes here
 
+%if nargin<3
+%    colorMode=[0 1 2 3];
+%end
+
+if nargin<4
+    featureMode='expanded';
+end
+
 addpath('tools/osu-svm');
 
 %Anzahl der Coins
@@ -11,7 +19,10 @@ numberOfCoins=size(coins,2);
 load SVMClassifier
 
 %Laden des Trainingssets für Euclidische Distanz
-load TrainingSet-2011-01-11_19-40-24
+load TrainingSet-HALE-2011-01-13_14-27-28.mat
+
+colorMode=svmFeatureMode(1,:);
+featureMode=svmFeatureMode(2,1);
 
 %Laden der Labeling-Struktur
 load LabelStruct
@@ -21,22 +32,70 @@ maxDim=50;
 %SVM Dimension
 svmDim=15;
 
-labels=[];
+%Groesse der Muenzen bestimmen
+coinSize=[];
 for i=1:numberOfCoins
     
     %Grauwertbild
-    imgGray=coins{1,i};
+    imgGray=getGrayImage(coins{1,i});
     
-    %Merkmalsvektor berechnen
-    [featureVeuclid featureVsvm kCoeff]=buildFeatureVector(imgGray, maxDim, svmDim);
+    %Bildgröße
+    [x y]=size(imgGray);
+    if mod(x,2)==0
+        imgGray = imresize(imgGray,size(imgGray)+1,'bilinear');
+    end
+    
+    %Groesse der Muenze
+    coinSize=[coinSize; size(imgGray,1)];
+    
+end
+
+%%
+%NORMIERUNG DER MUENZEN
+%Groesste Muenze
+maxCoinSize=max(coinSize);
+coinSize=coinSize./maxCoinSize;
+
+
+%FeatureVektor berechnen und klassifizieren
+labels=[];
+for i=1:numberOfCoins
+    
+    coloredFVeuclid=[];
+    coloredFVsvm=[];
+    for k=1:length(colorMode)
+        
+        %Grauwertbild bzw Farbwertbild
+        imgGray=getGrayImage(coins{1,i},colorMode(k));
+
+        %Bildgröße
+        [x y]=size(imgGray);
+        if mod(x,2)==0
+            imgGray = imresize(imgGray,size(imgGray)+1,'bilinear');
+        end
+
+        %Merkmalsvektor berechnen
+        [featureVeuclid featureVsvm kCoeff]=buildFeatureVector(imgGray, maxDim, svmDim);
+        coloredFVeuclid=[coloredFVeuclid featureVeuclid];
+        coloredFVsvm=[coloredFVsvm featureVsvm];
+    end
+    
+    %Groesse der Muenze
+    cSize=coinSize(i);
+    
+    %ExtraFeature: Groesse
+    if ~strcmp(featureMode,'normal')
+        coloredFVeuclid=[coloredFVeuclid cSize];
+        coloredFVsvm=[coloredFVsvm cSize];
+    end
     
     %Euclidische Distanz Klassifikation
-    dist=getFeatureDistance(featureVeuclid,TrainingSetEuclid);
+    dist=getFeatureDistance(coloredFVeuclid,TrainingSetEuclid);
     [value,index]=min(dist);
     euclidLabel=LabelSet(index);
     
     %SVM Klassifikation
-    [svmLabel DecisionValue]=SVMClass(featureVsvm', AlphaY, SVs, Bias, Parameters, nSV, nLabel);
+    [svmLabel DecisionValue]=SVMClass(coloredFVsvm', AlphaY, SVs, Bias, Parameters, nSV, nLabel);
     
     %LabelCollection
     labels=[labels; euclidLabel svmLabel];

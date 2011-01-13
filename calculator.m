@@ -22,7 +22,7 @@ for i=1:size(labelingStruct,1)
 end
 
 %Euro
-euro=floor(erg);
+euro=floor(double(erg));
 %Cent
 cent=(erg-euro)*100;
 

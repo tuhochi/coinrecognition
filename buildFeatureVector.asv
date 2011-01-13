@@ -13,9 +13,13 @@ imgPolar=imgPolar(d:end-2*d,:);
 coeff=calcCoeff(imgPolar,maxDim+1);
 
 
+%  figure
+%  disp('Polarbild: buildFeatureVector')
+%  imshow(imgPolar,[])
+
 %k-Kreise berechnen
 maxR = size(imgPolar,1);
-K=20; %Anzahl der Kreise
+K=10; %Anzahl der Kreise
 featureVeuclid=[];
 featureVsvm=[];
 kreisCoeff=[];
@@ -28,11 +32,14 @@ for i=1:K
     %Nur Realanteil der Koeffizienten
     kCoeff=abs(coeff(k(i,1):k(i,2),2:end));
     
+    if size(kCoeff,1)==1
+        i;
+    end
     %Mittelwert und Standardabweichung
-    m=mean(kCoeff,2);
-    v=var(kCoeff);
+    m=mean(kCoeff,1);
+    v=var(kCoeff,1);
     %Summe
-    s=sum(kCoeff);
+    s=sum(kCoeff,1);
     featureVeuclid=[featureVeuclid m v];
     featureVsvm=[featureVsvm m(:,1:svmDim) v(:,1:svmDim)];
     kreisCoeff=[kreisCoeff; m];

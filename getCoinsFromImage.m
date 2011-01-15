@@ -3,12 +3,13 @@ function [coins] = getCoinsFromImage(image,radius,debug)
 % als Struct "coins" returnt
 % diagonal ist der ungefaehr gesuchte radias
 
+originalImage=image;
 
 %% speed up
 if isstr(image)
     if exist(image)
         matfile=[image '.mat'];
-        if exist(matfile) % aus matfile laden wenn existiert
+        if exist(matfile)&& nargin<3 % aus matfile laden wenn existiert
             load(matfile);
             return
         end
@@ -127,7 +128,11 @@ kreis=sortrows(kreis,-3);
 if(nargin>2)
 %Originalbild
 figure
-imshow(image)
+    if isstr(originalImage)
+        imshow(imread(originalImage))
+    else
+        imshow(originalImage)
+    end
 hold on;
 end
 
@@ -143,7 +148,7 @@ for i=1:size(kreis,1)
         
     if(nargin>2)
 
-        rectangle('Position',[x y d d], 'EdgeColor', 'green', 'Curvature', [1 1]);
+        rectangle('Position',[x y d d], 'EdgeColor', 'green', 'Curvature', [1 1],'LineWidth', 2);
     end
     
     % bild extrahieren

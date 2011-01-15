@@ -1,4 +1,54 @@
-function [] = buildTrainingsSet(inputType,coinRadius,subfolderEx,colorMode,featureMode)
+function [] = buildTrainingsSet(inputType,coinRadius,subfolderEx,colorMode,featureMode,testMode)
+%buildTrainingsSet TrainingSet wird eingelesen und Klassifikatoren trainiert.  
+%
+%   demoCoinRecognition(inputType,coinRadius,subflderEx,colorMode,featureMode,testMode)
+%                       Das Trainingsset wird aus dem Ordner
+%                       'TrainingsData' eingelsen. Falls es sich um ein
+%                       Sammelbild (mehrere Muenzen auf einem Bild)
+%                       handelt, werden diese zuerst segmentiert. Aus den
+%                       einzelnen Muenzbilder werden Features berechnet und
+%                       im TrainingSet abgespeichert. Für die beiden
+%                       Klassifikatoren (SVM und Euklidischer Abstand)
+%                       werden zwei separate TrainingSets angelegt. Die Art
+%                       der Features unterscheiden sich dabei nicht,
+%                       sondern nur die Laenge der FeatureVektoren.
+%
+% I/O Spec
+%   inputType    'single': Im Ordner 'TrainingsData' befinden sich nur
+%                          Bilder, die je Bild nur eine Muenze beinhalten.
+%
+%                'collection': Im Ordner 'TrainingsData' befinden sich
+%                              Bilder, die auch mehrere Muenzen beinhalten koennen.
+%
+%   coinRadius   Mittlerer Radius der zu erkennenden Muenzen.
+%
+%
+%   subfolderEx  '_low': Es werden nur Bilder mit niedriger Aufloesung
+%                        herangezogen (kurze Berechnungszeit).
+% 
+%                '_medium': Es werden nur Bilder mit mittlerer Aufloesung
+%                           herangezogen (lange Berechnungszeit).
+% 
+% 
+%   colorMode   ein Vektor der die zu verwendeten Farbkanaele angibt
+%               0: Grau-Kanal
+%               1: Rot-Kanal
+%               2: Gruen-Kanal
+%               3: Blau-Kanal
+% 
+% 
+%   featureMode 'normal': Nur DFT-Koeffizienten der gewaehlten Farb-Kanaele
+%                         werden in dden Feature-Vektor aufgenommen.
+%
+%               'extended': Zu den DFT-Koeffizienten der gewaehlten
+%                           Farb-Kanaele wird die Groesse der segmentierten Muenze in
+%                           den Feature-Vektor aufgenommen.
+%
+%   testMode    Das TrainingSet wird fuer die CrossValidation gesondert
+%   abgespeichert: 'PC-PCName-Crossval.mat'
+%               0      off
+%               1      on  
+
 
 buildTrainingsSetTime= tic();
 
@@ -19,6 +69,11 @@ end
 if nargin<5
     %Nur Koeffizienten
     featureMode='extended';
+end
+
+if nargin<6
+    %testMode
+    testMode=0;
 end
 
 switch subfolderEx
@@ -61,7 +116,6 @@ maxDim=50;
 svmDim=15;
 
 %TrainingsDaten einlesen
-
 ordnerListing=dir(ordner);
 ordnerSize=size(ordnerListing,1);
 
@@ -120,7 +174,8 @@ for i=3:ordnerSize
                         if mod(x,2)==0
                             imgGray = imresize(imgGray,size(imgGray)+1,'bilinear');
                         end
-
+                        
+                        %Erstellen des FeatureVektors
                         [featureVeuclid featureVsvm]=buildFeatureVector(imgGray, maxDim, svmDim);
                         coloredFVeuclid=[coloredFVeuclid featureVeuclid];
                         coloredFVsvm=[coloredFVsvm featureVsvm];
@@ -145,7 +200,6 @@ for i=3:ordnerSize
                 %Groesse der Muenze
                 coinSize=[]; 
                 for l=1:countOfCoins
-                    l;
                     
                     coloredFVeuclid=[];
                     coloredFVsvm=[];
@@ -154,18 +208,21 @@ for i=3:ordnerSize
                         %Umwandlung in Grauwert oder Farbbild
                         imgCoin=getGrayImage(coins{1,l},colorMode(k));
                         
-%                         if strcmp(imgPath,'coin/TrainingsData_medium/2euroV/2eurozahl.jpg');
-%                             figure
-%                             disp('Farbbild: buildTrainingSet')
-%                             imshow(imgCoin,[])
-%                         end
+                        %Ausgabe der Polarbilder
+                        if strcmp(imgPath,'coin/TrainingsData_low/2euroV/2eurozahl.jpg') && l==1;
+                            figure
+                            title('Münze dargestellt in Polar-Koordinaten')
+                            disp('Polarbild der Münze des entsprechenden Farbkanals')
+                            imshow(imgCoin,[])
+                         end
                         
                         %Bildgröße
                         [x y]=size(imgCoin);
                         if mod(x,2)==0
                             imgCoin = imresize(imgCoin,size(imgCoin)+1,'bilinear');
                         end
-
+                        
+                        %Erstellen des FeatureVektors
                         [featureVeuclid featureVsvm kCoeff]=buildFeatureVector(imgCoin, maxDim, svmDim);
                         
                         coloredFVeuclid=[coloredFVeuclid featureVeuclid];
@@ -200,7 +257,9 @@ end
 sortCSize=sort(cSize);
 mMaxCoinSize=mean(sortCSize(end-1:end));
 %maxCoinSize=max(cSize);
+
 cSize=cSize./mMaxCoinSize;
+
 %cSiZe=floor(cSize*100)/100;
 
 for i=1:size(cSize)
@@ -238,15 +297,25 @@ if ~strcmp(featureMode,'normal')
     end
 end
 
-%Speichern der Labelings
-save LabelStruct labelingStruct;
-%Speichern des TrainingsSets
-f=['TrainingSet-' getenv('COMPUTERNAME') datestr(now,'-yyyy-mm-dd_HH-MM-SS') ];
-save(f,'TrainingSetEuclid', 'TrainingSetSVM', 'LabelSet', 'svmFeatureMode');
 
-%SVM Training
-%svmConstruction(typeSVM, samples, labels)
-svmConstruction(2, TrainingSetSVM', LabelSet');
+if testMode==0 % normaler Modus
+    %Speichern der Labelings
+    save LabelStruct labelingStruct;
+    %Speichern des TrainingsSets
+    f=['TrainingSet-' getenv('COMPUTERNAME') datestr(now,'-yyyy-mm-dd_HH-MM-SS') ];
+    save(f,'TrainingSetEuclid', 'TrainingSetSVM', 'LabelSet', 'svmFeatureMode');
+
+    %SVM Training
+    %svmConstruction(typeSVM, samples, labels)
+    svmConstruction(2, TrainingSetSVM', LabelSet');
+    
+else % crossval Modus
+    
+    %Speichern der Labelings
+    save (['PC-' getenv('COMPUTERNAME') '-Crossval-labelingStruct'] ,'labelingStruct');
+    %Speichern des TrainingsSets
+    save(['PC-' getenv('COMPUTERNAME') '-Crossval-TrainingSet'],'TrainingSetEuclid', 'TrainingSetSVM', 'LabelSet', 'svmFeatureMode');
+    % SVM wird nicht erstellt, erst in
 
 toc(buildTrainingsSetTime)
    

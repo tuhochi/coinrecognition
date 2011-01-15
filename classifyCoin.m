@@ -19,7 +19,7 @@ numberOfCoins=size(coins,2);
 load SVMClassifier
 
 %Laden des Trainingssets für Euclidische Distanz
-load TrainingSet-HALE-2011-01-13_14-27-28.mat
+load TrainingSet-ACE-ACER-2011-01-14_17-22-04.mat
 
 colorMode=svmFeatureMode(1,:);
 featureMode=svmFeatureMode(2,1);
@@ -85,8 +85,10 @@ for i=1:numberOfCoins
     
     %ExtraFeature: Groesse
     if ~strcmp(featureMode,'normal')
-        coloredFVeuclid=[coloredFVeuclid cSize];
-        coloredFVsvm=[coloredFVsvm cSize];
+        %coloredFVeuclid=[coloredFVeuclid cSize];
+        %coloredFVsvm=[coloredFVsvm cSize];
+        coloredFVeuclid=coloredFVeuclid.*cSize;
+        coloredFVsvm=coloredFVsvm.*cSize;
     end
     
     %Euclidische Distanz Klassifikation

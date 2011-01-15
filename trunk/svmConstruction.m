@@ -1,6 +1,10 @@
-function [] = svmConstruction(typeSVM, samples, labels )
+function [] = svmConstruction(typeSVM, samples, labels ,testMode)
 %SVMCONSTRUCTION Summary of this function goes here
 %   Detailed explanation goes here
+% testMode 0= normal, 1= crossval mode
+if nargin<4
+    testMode=0;
+end
 
 if(typeSVM==1)
     %Linearer Kernel
@@ -17,7 +21,11 @@ else
 end
 
 %save SVMClassifierLin AlphaY SVs Bias Parameters nSV nLabel;
-save SVMClassifier AlphaY SVs Bias Parameters nSV nLabel;
+if testMode==0
+    save SVMClassifier AlphaY SVs Bias Parameters nSV nLabel;
+else
+    save( [getenv('COMPUTERNAME') '-SVMClassifier'] ,'AlphaY' ,'SVs' ,'Bias' ,'Parameters' ,'nSV' ,'nLabel');
+end
 %[ClassRate, DecisionValue, Ns, ConfMatrix, PreLabels]= SVMTest(samples, labels, AlphaY, SVs, Bias,Parameters, nSV, nLabel);
 
 end

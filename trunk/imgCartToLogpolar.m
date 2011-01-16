@@ -1,4 +1,27 @@
 function [Ipol] = imgCartToLogpolar(img,polarType,fill,scalefactor,interpMethod)
+%imgCartToLogpolar Wandelt ein Bild von der kartesischen in die Log-Polar Darstellung um 
+%
+%   imgCartToLogpolar(img,polarType,fill,scalefactor,interpMethod)
+%                       Hierbei werden bezueglich des Bildmittelpunktes die
+%                       einzelnen Pixel-Koordinaten in Betrag und Phase
+%                       umgerechnet und als Log-Polar-Bild zurueckgeliefert
+%
+%
+% I/O Spec
+%   img             Eingangsbild
+%
+%   polarType       Intervallschritte der einzelnen neuen Achsen im
+%                   Polar-Koordinatensystem
+%                   'logpolar':     Log-Polar
+%                   '':             nicht Logarithmisch
+%               
+%   fill            0:          default, 2-D data interpolation interp2
+%
+%   scalefactor     Dimension des Bildes dargestellt in Polar-Koordinaten
+%                   1:          default
+%
+%   interpMethod    'linear':   default, 2-D data interpolation interp2
+
 
 %Interpolations-Methode
 if nargin<5 || isempty(interpMethod)

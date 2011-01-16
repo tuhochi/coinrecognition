@@ -1,9 +1,19 @@
 function [ opimg ] = cropCircle( i,p,c )
-%CROPCIRCLE Summary of this function goes here
-%   Detailed explanation goes here
-%   i Image
-%   p Prozent des Ausschnittes von Aussen [0..1]
-%   c Prozent des Ausschnittes von Innen  [0..1]
+%cropCircle Beschneidet ein Bild Kreisfoermig
+%
+%   cropCircle( i,p,c )
+%                       Die Hauptaufgabe dieser Methode ist es den
+%                       stoerenden Bild-Rand eines Muenz-Bildes zu
+%                       enterfnen. Dabei kann das Eingabebild kreisfoermig
+%                       von Aussen und Innen beschnitten werden.
+% I/O Spec
+%   i     Eingabebild
+%
+%   p     Prozent des kreisfoermigen Ausschnittes von Aussen [0..1]
+%
+%   c     Prozent des kreisfoermigen Ausschnittes von Innen [0..1]
+%
+%   opimg Beschnittenes Bild
 
 dim=max([size(i,1),size(i,1)]);%% x/y Dimension der quadratischen Bild Matrix
 r=round(dim/2);

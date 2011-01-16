@@ -1,11 +1,31 @@
 function [coins] = getCoinsFromImage(image,radius,debug)
-% Es wird mittels der hough-Transformation die einzelnen Coins gesucht und
-% als Struct "coins" returnt
-% diagonal ist der ungefaehr gesuchte radias
+%getCoinsFromImage Extrahiert Muenzen aus einem Bild mittels Houg Transformation  
+%
+%   getCoinsFromImage(image,radius,debug)
+%                       Es werden mittels Houge Transformation aus dem
+%                       uebergebenen Bild die eizelnen Muenzen extrahiert.
+%
+% I/O Spec
+%   image       Eingabebild mit einer oder mehreren Muenzen
+%               
+%
+%   radius      Mittlerer Radius der Muenzen, durch diesen Parameter wird die
+%               Hough Transformation viel schneller druchgefuehrt. 
+%               Die moeglichen Muenzen Radien werden in einem Bereich von
+%               +/- 39 Prozent des radius gesucht
+%
+%   debug       Durch einen beliebigen Parameter in der debug Variable
+%               werden die gefundenen Muenzen angezeigt
+%
+%   coins       Der Rueckgabewert coins beinhaltet ein Struct mit den
+%               einezelnen Bildern.
 
 originalImage=image;
 
 %% speed up
+%Falls schon einmal eine Hough-Transformation auf ein Bild
+% durchgefuehrt wurde, werden die Coins nur noch aus dem gespeicherten
+% Struct geladen
 if isstr(image)
     if exist(image)
         matfile=[image '.mat'];
@@ -18,19 +38,17 @@ if isstr(image)
     end
 end
 
-%%
+%% Beginn der Houge Transformation
 
 time=tic();
-global TEST;
-TEST=1;
 
 if(nargin==1) % wenn keine diagonale angegeben ist
-    minR = 90/4
-    maxR = 180/4 
+    minR = 90/4;
+    maxR = 180/4; 
     radius= 135/4;
 else
-    minR = round(radius*(1-0.39))
-    maxR = round(radius*(1+0.39))
+    minR = round(radius*(1-0.39));
+    maxR = round(radius*(1+0.39));
 end
 
 mergeDistance=radius*2;
@@ -98,7 +116,7 @@ for radius = minR:maxR
     %wert "a"
     [y x a]=find(ausschnitt);
     
-    %Hinzufügen von Kreisobjekten [x y radius ???] ?????
+    %Hinzufügen von Kreisobjekten [x y radius akkumulatorwert]
     kreis=[kreis; [x-maxR, y-maxR, radius*ones(length(x),1), a*umfang]];
 end
 
@@ -133,6 +151,7 @@ figure
     else
         imshow(originalImage)
     end
+title('Ergebniss der Hough-Transformation')
 hold on;
 end
 
@@ -148,7 +167,7 @@ for i=1:size(kreis,1)
         
     if(nargin>2)
 
-        rectangle('Position',[x y d d], 'EdgeColor', 'green', 'Curvature', [1 1],'LineWidth', 2);
+        rectangle('Position',[x y d d], 'EdgeColor', 'green', 'Curvature', [1 1]);
     end
     
     % bild extrahieren

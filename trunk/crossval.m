@@ -1,31 +1,25 @@
 function [meanPrecision Precision] = crossval()
-% Crossvalidierung der 8 Euromuenzen Vorder- und Rueckseite
-% mode [0]: es wird fuer alle Muenzen durchgefuehrt [1 2]: erste Muneze 
-% Precision: gibt den prozentuellen Anteil der richtig klassifizierten
-% Muenzen an
+%Krossvalidierung mittels Poly-SVM und Euklid Klassifikator
+%
+%   svmConstruction(typeSVM, samples, labels ,testMode)
+%                       Es wir zuerst eine Poly-SVM erstellet, weiters eine
+%                       Einteilung mittels cvpartition erstellt.
+%                       und die Parameter werden 
 addpath('tools/osu-svm');
-% if nargin <1
-%     mode=[0];
-% end
-
-%     for i=i:size(mode,2)
-%         
-%         
-%     end
 
 %% spezifisches TrainingsSet 
 
 colorMode=[1 2 3];
-buildTrainingsSet('collection',1,'_low',colorMode,'extended',1);
+buildTrainingsSet('collection',1,'_low',colorMode,'normal',1);
 %laden der Labelings
-load (['PC-' getenv('COMPUTERNAME') '-Crossval-labelingStruct'] ,'labelingStruct');
+load ('Crossval-labelingStruct' ,'labelingStruct');
 %laden des TrainingsSets
-load(['PC-' getenv('COMPUTERNAME') '-Crossval-TrainingSet']);
+load('Crossval-TrainingSet');
 %SVM wird nun erstellt
 
 
 %Aufteilung der Daten in Training und TestSet
-c = cvpartition(LabelSet,'kfold',400);
+c = cvpartition(LabelSet,'kfold',316);
 %% Nun die jeweiligen Training- und TestSets
 Precision=[];
 for i=1:c.NumTestSets
@@ -39,9 +33,6 @@ for i=1:c.NumTestSets
     crossTestSetSVM=TrainingSetSVM(c.test(i),:); 
     crossTestSetEuclid=TrainingSetEuclid(c.test(i),:);
     crossTestLabelSet=LabelSet(c.test(i),:);
-    % SVM erstellen
-    %svmConstruction(2, TrainTrainingSetSVM', TrainLabelSet',1);
-    %load([getenv('COMPUTERNAME') '-SVMClassifier']);
     
     %SVM erstellen
     disp(['Poly SVM (' num2str(i) '/' num2str(c.NumTestSets) ') wird erstellt'])

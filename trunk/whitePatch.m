@@ -1,39 +1,43 @@
-function [ newimage ] = whitePatch( image )
-%WHITEPATCHRETINEX Summary of this function goes here
-%   Detailed explanation goes here
-%clear
-%imgName ='coin/shoot/IMG_6829_02.jpg';
+function [ newimage ] = whitePatch(image,gaussSize)
+%whitePatch TrainingSet wird eingelesen und Klassifikatoren trainiert.  
+%
+%   whitePatch(image)
+%                       Dieser whitePatch Algoritmus ist so impementiert,
+%                       dass zuerst auf das Eingangsbild (image) ein
+%                       Gaussfilter angewendet wird (blur), um eine
+%                       gleichmaessigere Lichtintensitaet im Bild zu
+%                       erhalten. Danach wird eine Kopie des Eingangsbildes
+%                       erstellt und mittels den min und max Werten des
+%                       blur Images passend skaliert.
+%                      
+% I/O Spec
+%   image   Eingangsbild auf dem der WhitePatch angewendet wird
+%
+%   gaussSize   Mittlerer Radius der zu erkennenden Muenzen.
+%% Eingangsparameter ueberpruefen
+if nargin<2
+    gaussSize=30;
+end
 
-%Laden des Images
-%image = imread(imgName);
+if ischar(image)
+    image = imread(image);
+end
 
-
-h = fspecial('gaussian',30,30);
+%% geblurtes Image ertellen
+h = fspecial('gaussian',gaussSize,gaussSize);
 blur=imfilter(image,h);
-%figure(1)
-%subplot(2,1,1)
-%imshow(image)
 
-% Image bluring for an average Patch
 mi(1:3)=min(min(blur(:,:,:)));
-% set minimum of image to min
+ma(1:3)=max(max(blur(:,:,:)));
+%% Bild skallieren
 newimage=image;
 newimage(:,:,1) = newimage(:,:,1)-mi(1);
 newimage(:,:,2) = newimage(:,:,2)-mi(2);
 newimage(:,:,3) = newimage(:,:,3)-mi(3);
 
-
-ma(1:3)=max(max(blur(:,:,:)));
-
-%subplot(2,1,2)
 newimage(:,:,1) = newimage(:,:,1).*(255/double(ma(1)));
 newimage(:,:,2) = newimage(:,:,2).*(255/double(ma(2)));
 newimage(:,:,3) = newimage(:,:,3).*(255/double(ma(3)));
-%imshow(newimage)
-
-
-%figure(2)
-%imshow(newimage-image)
 
 end
 

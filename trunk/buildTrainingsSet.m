@@ -1,7 +1,7 @@
 function [] = buildTrainingsSet(inputType,coinRadius,subfolderEx,colorMode,featureMode,testMode)
 %buildTrainingsSet TrainingSet wird eingelesen und Klassifikatoren trainiert.  
 %
-%   demoCoinRecognition(inputType,coinRadius,subflderEx,colorMode,featureMode,testMode)
+%   buildTrainingsSet(inputType,coinRadius,subflderEx,colorMode,featureMode,testMode)
 %                       Das Trainingsset wird aus dem Ordner
 %                       'TrainingsData' eingelsen. Falls es sich um ein
 %                       Sammelbild (mehrere Muenzen auf einem Bild)
@@ -45,7 +45,7 @@ function [] = buildTrainingsSet(inputType,coinRadius,subfolderEx,colorMode,featu
 %                           den Feature-Vektor aufgenommen.
 %
 %   testMode    Das TrainingSet wird fuer die CrossValidation gesondert
-%   abgespeichert: 'PC-PCName-Crossval.mat'
+%   abgespeichert: 'Crossval.mat'
 %               0      off
 %               1      on  
 
@@ -64,7 +64,7 @@ end
 
 if nargin<4
     %Grauwertbilder
-    colorMode=[0 1 2 3];
+    colorMode=[1 2 3];
 end
 if nargin<5
     %Nur Koeffizienten
@@ -78,11 +78,11 @@ end
 
 switch subfolderEx
     case '_low'
-        coinRadius=135/4
+        coinRadius=135/4;
     case '_medium'
-        coinRadius=135/2
+        coinRadius=135/2;
     case ''
-        coinRadius=135
+        coinRadius=135;
 end
 
 svmFeatureMode(1,:)=colorMode;
@@ -145,6 +145,7 @@ for i=3:ordnerSize
             
             
             if(realfile(readFile) ) % && strcmp(readFile,'2eurokopf.jpg')
+            disp(' ');
             disp(['Ordner: ' class ' Datei: ' readFile]);
 
                 %Pfad des Bildes
@@ -160,14 +161,37 @@ for i=3:ordnerSize
                     
                     coloredFVeuclid=[];
                     coloredFVsvm=[];
+                    
+                    %Figure fuer Muenzen
+                    figure
                     for k=1:length(colorMode)
                         
                         %Umwandlung in Grauwert oder Farbbild
                         imgGray=getGrayImage(img,colorMode(k));
                         
                         figure
-                        disp('Farbbild: buildTrainingSet')
-                        imshow(imgGray,[])
+                        switch colorMode(k)
+                                case 0
+                                    subplot(3,length(colorMode),k)
+                                    disp('Grauwertbild einer Münze')
+                                    imshow(imgCoin,[])
+                                    title('Grauwertbild')
+                                case 1
+                                    subplot(3,length(colorMode),k)
+                                    disp('Roter Farbkanal einer Münze')
+                                    imshow(imgCoin,[])
+                                    title('Rot-Kanal')
+                                case 2
+                                    subplot(3,length(colorMode),k)
+                                    disp('Grüner Farbkanal einer Münze')
+                                    imshow(imgCoin,[])
+                                    title('Grün-Kanal')
+                                case 3
+                                    subplot(3,length(colorMode),k)
+                                    disp('Blauer Farbkanal einer Münze')
+                                    imshow(imgCoin,[])
+                                    title('Blau-Kanal')
+                        end
                         
                         %Bildgröße
                         [x y]=size(imgGray);
@@ -176,7 +200,56 @@ for i=3:ordnerSize
                         end
                         
                         %Erstellen des FeatureVektors
-                        [featureVeuclid featureVsvm]=buildFeatureVector(imgGray, maxDim, svmDim);
+                        [featureVeuclid featureVsvm kreisCoeff allCoeff imgPolar]=buildFeatureVector(imgGray, maxDim, svmDim);
+                        
+                        switch colorMode(k)
+                                case 0
+                                    subplot(3,length(colorMode),k+length(colorMode))
+                                    disp('Grauwertbild einer Münze in Polarkoordinaten')
+                                    imshow(imgPolar,[])
+                                    title('Grauwertbild Polar')
+                                case 1
+                                    subplot(3,length(colorMode),k+length(colorMode))
+                                    disp('Roter Farbkanal einer Münze in Polarkoordinaten')
+                                    imshow(imgPolar,[])
+                                    title('Rot-Kanal Polar')
+                                case 2
+                                    subplot(3,length(colorMode),k+length(colorMode))
+                                    disp('Grüner Farbkanal einer Münze in Polarkoordinaten')
+                                    imshow(imgPolar,[])
+                                    title('Grün-Kanal Polar')
+                                case 3
+                                    subplot(3,length(colorMode),k+length(colorMode))
+                                    disp('Blauer Farbkanal einer Münze in Polarkoordinaten')
+                                    imshow(imgPolar,[])
+                                    title('Blau-Kanal Polar')
+                            end
+                            
+                            %Ausgabe einer Muenze rekonstruiert durch
+                            %15 DFT Koeffizienten
+                            switch colorMode(k)
+                                case 0
+                                    subplot(3,length(colorMode),k+2*length(colorMode))
+                                    disp('Grauwertbild einer Münze mit nur 15 DFT-Koeffizienten')
+                                    imshow(reconstructImg(allCoeff(:,1:15),size(imgCoin,2)),[])
+                                    title('Grauwertbild mit nur 15 DFT-Koeff')
+                                case 1
+                                    subplot(3,length(colorMode),k+2*length(colorMode))
+                                    disp('Roter Farbkanal einer Münze mit nur 15 DFT-Koeffizienten')
+                                    imshow(reconstructImg(allCoeff(:,1:15),size(imgCoin,2)),[])
+                                    title('Rot-Kanal mit nur 15 DFT-Koeff')
+                                case 2
+                                    subplot(3,length(colorMode),k+2*length(colorMode))
+                                    disp('Grüner Farbkanal einer Münze mit nur 15 DFT-Koeffizienten')
+                                    imshow(reconstructImg(allCoeff(:,1:15),size(imgCoin,2)),[])
+                                    title('Grün-Kanal mit nur 15 DFT-Koeff')
+                                case 3
+                                    subplot(3,length(colorMode),k+2*length(colorMode))
+                                    disp('Blauer Farbkanal einer Münze mit nur 15 DFT-Koeffizienten')
+                                    imshow(reconstructImg(allCoeff(:,1:15),size(imgCoin,2)),[])
+                                    title('Blau-Kanal mit nur 15 DFT-Koeff')
+                            end
+                        
                         coloredFVeuclid=[coloredFVeuclid featureVeuclid];
                         coloredFVsvm=[coloredFVsvm featureVsvm];
                     end
@@ -190,9 +263,14 @@ for i=3:ordnerSize
                     allCoinSize=[allCoinSize; mCoinSize];
 
                 else
-                %%
-                %CollectionBild
-                coins=getCoinsFromImage(imgPath,coinRadius);
+                %% CollectionBild
+                %
+                if strcmp(imgPath,'coin/TrainingsData_low/2euroV/2eurozahl.jpg')
+                    coins=getCoinsFromImage(imgPath,coinRadius,1);
+                else
+                    coins=getCoinsFromImage(imgPath,coinRadius);
+                end
+                
                 countOfCoins=size(coins,2);
                 disp(['Anzahl der gefundenen Münzen: ' num2str(countOfCoins)]);
                 disp('Berechnung der Koeffizienten');
@@ -203,17 +281,44 @@ for i=3:ordnerSize
                     
                     coloredFVeuclid=[];
                     coloredFVsvm=[];
+                    
+                    %Figure fuer Muenzen
+                    if strcmp(imgPath,'coin/TrainingsData_low/2euroV/2eurozahl.jpg') && l==1;
+                        figure('Position',[20 20 800 500])
+                    end
                     for k=1:length(colorMode)
                         
+                        % Color constancy -Anwednung von whitepatch
+                        coinWp=coins{1,l};
+                       
                         %Umwandlung in Grauwert oder Farbbild
-                        imgCoin=getGrayImage(coins{1,l},colorMode(k));
+                        imgCoin=getGrayImage(coinWp,colorMode(k));
                         
-                        %Ausgabe der Polarbilder
+                        %Ausgabe der Farbbilder
                         if strcmp(imgPath,'coin/TrainingsData_low/2euroV/2eurozahl.jpg') && l==1;
-                            figure
-                            title('Münze dargestellt in Polar-Koordinaten')
-                            disp('Polarbild der Münze des entsprechenden Farbkanals')
-                            imshow(imgCoin,[])
+                            
+                            switch colorMode(k)
+                                case 0
+                                    subplot(3,length(colorMode),k)
+                                    disp('Grauwertbild einer Münze')
+                                    imshow(imgCoin,[])
+                                    title('Grauwertbild')
+                                case 1
+                                    subplot(3,length(colorMode),k)
+                                    disp('Roter Farbkanal einer Münze')
+                                    imshow(imgCoin,[])
+                                    title('Rot-Kanal')
+                                case 2
+                                    subplot(3,length(colorMode),k)
+                                    disp('Grüner Farbkanal einer Münze')
+                                    imshow(imgCoin,[])
+                                    title('Grün-Kanal')
+                                case 3
+                                    subplot(3,length(colorMode),k)
+                                    disp('Blauer Farbkanal einer Münze')
+                                    imshow(imgCoin,[])
+                                    title('Blau-Kanal')
+                            end
                          end
                         
                         %Bildgröße
@@ -223,11 +328,68 @@ for i=3:ordnerSize
                         end
                         
                         %Erstellen des FeatureVektors
-                        [featureVeuclid featureVsvm kCoeff]=buildFeatureVector(imgCoin, maxDim, svmDim);
+                        [featureVeuclid featureVsvm kCoeff allCoeff imgPolar]=buildFeatureVector(imgCoin, maxDim, svmDim);
+                        
+                        %Ausgabe der Farbbilder
+                        if strcmp(imgPath,'coin/TrainingsData_low/2euroV/2eurozahl.jpg') && l==1;
+                            
+                          
+                            switch colorMode(k)
+                                case 0
+                                    subplot(3,length(colorMode),k+length(colorMode))
+                                    disp('Grauwertbild einer Münze in Polarkoordinaten')
+                                    imshow(imgPolar,[])
+                                    title('Grauwertbild Polar')
+                                case 1
+                                    subplot(3,length(colorMode),k+length(colorMode))
+                                    disp('Roter Farbkanal einer Münze in Polarkoordinaten')
+                                    imshow(imgPolar,[])
+                                    title('Rot-Kanal Polar')
+                                case 2
+                                    subplot(3,length(colorMode),k+length(colorMode))
+                                    disp('Grüner Farbkanal einer Münze in Polarkoordinaten')
+                                    imshow(imgPolar,[])
+                                    title('Grün-Kanal Polar')
+                                case 3
+                                    subplot(3,length(colorMode),k+length(colorMode))
+                                    disp('Blauer Farbkanal einer Münze in Polarkoordinaten')
+                                    imshow(imgPolar,[])
+                                    title('Blau-Kanal Polar')
+                            end
+                            
+                            %Ausgabe einer Muenze rekonstruiert durch
+                            %15 DFT Koeffizienten
+                            switch colorMode(k)
+                                case 0
+                                    subplot(3,length(colorMode),k+2*length(colorMode))
+                                    disp('Grauwertbild einer Münze mit nur 15 DFT-Koeffizienten')
+                                    imshow(reconstructImg(allCoeff(:,1:15),size(imgCoin,2)),[])
+                                    title('Grauwertbild mit nur 15 DFT-Koeff')
+                                case 1
+                                    subplot(3,length(colorMode),k+2*length(colorMode))
+                                    disp('Roter Farbkanal einer Münze mit nur 15 DFT-Koeffizienten')
+                                    imshow(reconstructImg(allCoeff(:,1:15),size(imgCoin,2)),[])
+                                    title('Rot-Kanal mit nur 15 DFT-Koeff')
+                                case 2
+                                    subplot(3,length(colorMode),k+2*length(colorMode))
+                                    disp('Grüner Farbkanal einer Münze mit nur 15 DFT-Koeffizienten')
+                                    imshow(reconstructImg(allCoeff(:,1:15),size(imgCoin,2)),[])
+                                    title('Grün-Kanal mit nur 15 DFT-Koeff')
+                                case 3
+                                    subplot(3,length(colorMode),k+2*length(colorMode))
+                                    disp('Blauer Farbkanal einer Münze mit nur 15 DFT-Koeffizienten')
+                                    imshow(reconstructImg(allCoeff(:,1:15),size(imgCoin,2)),[])
+                                    title('Blau-Kanal mit nur 15 DFT-Koeff')
+                            end 
+                            
+                         end
                         
                         coloredFVeuclid=[coloredFVeuclid featureVeuclid];
                         coloredFVsvm=[coloredFVsvm featureVsvm];
 
+                    end
+                    if strcmp(imgPath,'coin/TrainingsData_low/2euroV/2eurozahl.jpg') && l==1;
+                        input('Weiter mit Enter....')
                     end
                     
                     %Groesse der Muenze
@@ -238,7 +400,6 @@ for i=3:ordnerSize
                     LabelSet=[LabelSet; label];
                 end
                
-                
                 %Mittlere Groesse der Muenze
                 mCoinSize=mean(coinSize);
                 allCoinSize=[allCoinSize; mCoinSize];
@@ -302,8 +463,7 @@ if testMode==0 % normaler Modus
     %Speichern der Labelings
     save LabelStruct labelingStruct;
     %Speichern des TrainingsSets
-    f=['TrainingSet-' getenv('COMPUTERNAME') datestr(now,'-yyyy-mm-dd_HH-MM-SS') ];
-    save(f,'TrainingSetEuclid', 'TrainingSetSVM', 'LabelSet', 'svmFeatureMode');
+    save('TrainingSet','TrainingSetEuclid', 'TrainingSetSVM', 'LabelSet', 'svmFeatureMode');
 
     %SVM Training
     %svmConstruction(typeSVM, samples, labels)
@@ -312,9 +472,9 @@ if testMode==0 % normaler Modus
 else % crossval Modus
     
     %Speichern der Labelings
-    save (['PC-' getenv('COMPUTERNAME') '-Crossval-labelingStruct'] ,'labelingStruct');
+    save ('Crossval-labelingStruct' ,'labelingStruct');
     %Speichern des TrainingsSets
-    save(['PC-' getenv('COMPUTERNAME') '-Crossval-TrainingSet'],'TrainingSetEuclid', 'TrainingSetSVM', 'LabelSet', 'svmFeatureMode');
+    save('Crossval-TrainingSet','TrainingSetEuclid', 'TrainingSetSVM', 'LabelSet', 'svmFeatureMode');
     % SVM wird nicht erstellt, erst in
 
 toc(buildTrainingsSetTime)

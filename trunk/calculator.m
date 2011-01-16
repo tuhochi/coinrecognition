@@ -1,6 +1,15 @@
 function [ result ] = calculator( labeling )
-%CALCULATOR Summary of this function goes here
-%   Detailed explanation goes here
+%calculator Berechnet die Summe der einzelen Muenzen
+%
+%   calculator( labeling )
+%                       Durch die einzelenen Labelings wird die Summe der
+%                       Meunezen berechnet.
+%
+%
+% I/O Spec
+%   labeling    Labeling der einzelnen Muenzen           
+%
+%   result      Summe der Muenzen
 
 %Labeling laden
 load LabelStruct
@@ -22,11 +31,12 @@ for i=1:size(labelingStruct,1)
 end
 
 %Euro
-euro=floor(double(erg));
+%euro=floor(double(erg));
 %Cent
-cent=(erg-euro)*100;
+%cent=(erg-euro)*100;
 
-result= [num2str(euro) ' Euro ' num2str(cent) ' Cent'];
+%result= [num2str(euro) ' Euro ' num2str(cent) ' Cent'];
+result= [num2str(erg) ' Euro'];
 
 end
 

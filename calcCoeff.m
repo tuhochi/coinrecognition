@@ -1,10 +1,25 @@
-function [ coeff ] = calcCoeff( img,coeffCount )
-%CALCCOEFF Summary of this function goes here
-%   Detailed explanation goes here
+function [ coeff ] = calcCoeff(img,coeffCount)
+%calcCoeff Eine bestimmte Anzahl an DFT-Koeffizienten eines Bildes werden berechnet.  
+%
+%   calcCoeff(img,coeffCount)
+%                       Fuer ein Bild (Polar-Koordinaten) werden eine
+%                       bestimmte Anzahl an DFT-Koeffizienten berechnet.
+%                       Die Koeffizienten werden immer pro Bildzeile
+%                       berechnet.
+%                       Mit diesen Koeffizienten ist es moeglich das
+%                       Ursprungsbild wiederherzustellen.
+%
+%
+% I/O Spec
+%   img         Bild von dem die DFT-Koeffizienten gesucht sind.
+%               
+%
+%   coeffCount  Bestimmt die Anzahl der gewuenschten DFT-Koeffizienten.
+%
+%
+%   coeff       Die berechneten Koeffizienten, die das Ausgangsbild
+%               beschreiben.
 
-%figure
-%title('Originalbild')
-%imshow(img./255);
 
 %Index der Spalten pro Zeile
 index=linspace(1,size(img,2),size(img,2));

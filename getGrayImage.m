@@ -1,8 +1,22 @@
 function [ gray ] = getGrayImage(image,type)
-% es wir ein Bild in ein gauwert-Bild umgesandelt
-% image kann ein Pfad, oder ein Farbbild sein
-% gray ist das gauwert-Bild
-% type: 0 normales graubild, 1: rot-Kanal, 2: gruen-Kanal, 3: blau-kanal, all other: farbbild 
+%getGrayImage Liefert einen bestimmten Farbkanal eines Bildes als Grauwertbild.  
+%
+%   getGrayImage(image,type)
+%                       Ein Bild wird je nach Wahl in ein reines
+%                       Grauwertbild oder in ein Grauwertbild eines
+%                       einzelnen Farbkanales umgewandelt.
+%
+%
+% I/O Spec
+%   image       Das Bild, welches umgewandelt werden soll.
+%               
+%
+%   type        0: Ein Grauwertbild wird zuruckgeliefert.
+%               1: Der Rot-Kanal eines Bildes wird zuruckgeliefert.
+%               2: Der Gruen-Kanal eines Bildes wird zuruckgeliefert.
+%               3: Der Blau-Kanal eines Bildes wird zuruckgeliefert.
+
+
 if nargin<2
     type=0;
 end
@@ -25,9 +39,7 @@ if(size(image,3)==3)
         case 3% Grauwertbild des blau-Kanals
             image=image(:,:,3);
     end
-    
-    
-    
+            
 end
 
 gray=image;

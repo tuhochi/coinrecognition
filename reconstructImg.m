@@ -1,6 +1,21 @@
 function [ reImg ] = reconstructImg( coeff, columns )
-%RECONSTRUCTIMG Summary of this function goes here
-%   Detailed explanation goes here
+%reconstructImg Durch DFT-Koeffizienten wird das Ausgangsbild wieder berechnet.  
+%
+%   reconstructImg(coeff,columns)
+%                       Es wird das Urpsungsbild der DFT-Koeffizienten
+%                       rekonstruiert. Dafuer ist es notwendig, die Groesse
+%                       des Ursprungsbildes zu wissen.
+%
+%
+% I/O Spec
+%   coeff       Die berechneten Koeffizienten, die das Ursprungsbild
+%               beschreiben.
+%
+%
+%   columns     Die Groesse des Ursprungbildes.
+%               
+%
+%   reImg       Das aus den DFT-Koeffizienten rekonstruierte Ursprungsbild.
 
 
 index=linspace(1,size(coeff,2),size(coeff,2));
@@ -17,5 +32,6 @@ for row=1:size(coeff,1)
     reImg=[reImg; reImgRow];
 end
 
+reImg=abs(reImg);
 end
 

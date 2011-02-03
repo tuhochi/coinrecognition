@@ -1,4 +1,4 @@
-function [] = buildTrainingsSet(inputType,coinRadius,subfolderEx,colorMode,featureMode,testMode)
+function [] = buildTrainingsSet(inputType,coinRadius,subfolderEx,colorMode,featureMode,testMode,outputMode,exSize)
 %buildTrainingsSet TrainingSet wird eingelesen und Klassifikatoren trainiert.  
 %
 %   buildTrainingsSet(inputType,coinRadius,subflderEx,colorMode,featureMode,testMode)
@@ -48,7 +48,24 @@ function [] = buildTrainingsSet(inputType,coinRadius,subfolderEx,colorMode,featu
 %   abgespeichert: 'Crossval.mat'
 %               0      off
 %               1      on  
+%
+%   outputMode  gesonderte Ausgabe von Zwischenergebnissen
+%               0      off
+%               1      on  
+%
+%   exSize          Skallierungsgroesse der einzelnen Muenzen
+%                   Es handelt sich um einen zusaetzlichen Parameter fuer
+%                   experimentelle Zwecke
+%               0      off
+%               >0      resize is on
 
+if nargin<7
+    outputMode=1;
+end
+
+if nargin<8
+    exSize=0;
+end
 
 buildTrainingsSetTime= tic();
 
@@ -200,7 +217,7 @@ for i=3:ordnerSize
                         end
                         
                         %Erstellen des FeatureVektors
-                        [featureVeuclid featureVsvm kreisCoeff allCoeff imgPolar]=buildFeatureVector(imgGray, maxDim, svmDim);
+                        [featureVeuclid featureVsvm kreisCoeff allCoeff imgPolar]=buildFeatureVector(imgGray, maxDim, svmDim,exSize);
                         
                         switch colorMode(k)
                                 case 0
@@ -283,7 +300,7 @@ for i=3:ordnerSize
                     coloredFVsvm=[];
                     
                     %Figure fuer Muenzen
-                    if strcmp(imgPath,'coin/TrainingsData_low/2euroV/2eurozahl.jpg') && l==1;
+                    if strcmp(imgPath,'coin/TrainingsData_low/2euroV/2eurozahl.jpg') && l==1 && outputMode;
                         figure('Position',[20 20 800 500])
                     end
                     for k=1:length(colorMode)
@@ -294,8 +311,9 @@ for i=3:ordnerSize
                         %Umwandlung in Grauwert oder Farbbild
                         imgCoin=getGrayImage(coinWp,colorMode(k));
                         
+                        
                         %Ausgabe der Farbbilder
-                        if strcmp(imgPath,'coin/TrainingsData_low/2euroV/2eurozahl.jpg') && l==1;
+                        if strcmp(imgPath,'coin/TrainingsData_low/2euroV/2eurozahl.jpg') && l==1 && outputMode;
                             
                             switch colorMode(k)
                                 case 0
@@ -328,10 +346,10 @@ for i=3:ordnerSize
                         end
                         
                         %Erstellen des FeatureVektors
-                        [featureVeuclid featureVsvm kCoeff allCoeff imgPolar]=buildFeatureVector(imgCoin, maxDim, svmDim);
+                        [featureVeuclid featureVsvm kCoeff allCoeff imgPolar]=buildFeatureVector(imgCoin, maxDim, svmDim,exSize);
                         
                         %Ausgabe der Farbbilder
-                        if strcmp(imgPath,'coin/TrainingsData_low/2euroV/2eurozahl.jpg') && l==1;
+                        if strcmp(imgPath,'coin/TrainingsData_low/2euroV/2eurozahl.jpg') && l==1 && outputMode;
                             
                           
                             switch colorMode(k)
@@ -388,7 +406,7 @@ for i=3:ordnerSize
                         coloredFVsvm=[coloredFVsvm featureVsvm];
 
                     end
-                    if strcmp(imgPath,'coin/TrainingsData_low/2euroV/2eurozahl.jpg') && l==1;
+                    if strcmp(imgPath,'coin/TrainingsData_low/2euroV/2eurozahl.jpg') && l==1 && outputMode;
                         input('Weiter mit Enter....')
                     end
                     

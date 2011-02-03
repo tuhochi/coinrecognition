@@ -1,16 +1,34 @@
-function [meanPrecision Precision] = crossval()
+function [meanPrecision Precision] = crossval(outputMode,exSize)
 %Krossvalidierung mittels Poly-SVM und Euklid Klassifikator
 %
 %   svmConstruction(typeSVM, samples, labels ,testMode)
 %                       Es wir zuerst eine Poly-SVM erstellet, weiters eine
 %                       Einteilung mittels cvpartition erstellt.
 %                       und die Parameter werden 
+%
+%   outputMode  gesonderte Ausgabe von Zwischenergebnissen
+%               0      off
+%               1      on 
+%
+%   exSize          Skallierungsgroesse der einzelnen Muenzen
+%                   Es handelt sich um einen zusaetzlichen Parameter fuer
+%                   experimentelle Zwecke
+%               0      off
+%               >0      resize is on
 addpath('tools/osu-svm');
+
+if nargin<1
+    outputMode=1;
+end
+
+if nargin<2
+    exSize=0;
+end
 
 %% spezifisches TrainingsSet 
 
 colorMode=[1 2 3];
-buildTrainingsSet('collection',1,'_low',colorMode,'normal',1);
+buildTrainingsSet('collection',1,'_low',colorMode,'normal',1,outputMode,exSize);
 %laden der Labelings
 load ('Crossval-labelingStruct' ,'labelingStruct');
 %laden des TrainingsSets

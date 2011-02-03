@@ -1,4 +1,4 @@
-function [ featureVeuclid featureVsvm kreisCoeff coeff imgPolar] = buildFeatureVector(imgGray, maxDim, svmDim )
+function [ featureVeuclid featureVsvm kreisCoeff coeff imgPolar] = buildFeatureVector(imgGray, maxDim, svmDim,exSize )
 %buildFeatureVector Fuer ein Grauwertbild werden zwei Feature-Vektoren erstellt.  
 %
 %   buildFeatureVector(imgGray, maxDim, svmDim)
@@ -49,6 +49,21 @@ function [ featureVeuclid featureVsvm kreisCoeff coeff imgPolar] = buildFeatureV
 %
 %   imgPolar        Das berechnete 2D-Polarbild vom ausgegangenen
 %                   Grauwertbild.
+%
+%   exSize          Skallierungsgroesse der einzelnen Muenzen
+%                   Es handelt sich um einen zusaetzlichen Parameter fuer
+%                   experimentelle Zwecke
+%               0      off
+%               >0      resize is on
+
+if nargin <4
+    exSize=0;
+end
+
+if(exSize>0)
+    imgGray = imresize(imgGray,[exSize exSize],'bilinear');% minimale groesse ist [23 23]
+end
+
 
 %Transformation in Polar-Koordinaten
 imgPolar=imgCartToLogpolar(imgGray);
